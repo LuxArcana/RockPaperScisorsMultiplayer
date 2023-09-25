@@ -35,7 +35,7 @@ placeMoveResponse = _service.PlaceMove(player2Contest.contestId, player2Contest.
 player2Contest = placeMoveResponse.contestResponse
 
 
-placeMoveResponse = _service.PlaceMove(player1Contest.contestId, player1Contest.currentGameId, player1Contest.playerId, 'PAPER')
+placeMoveResponse = _service.PlaceMove(player1Contest.contestId, player1Contest.currentGameId, player1Contest.playerId, 'PAPER') #REQUEST SERVER TO PLACE MOVE
 player1Contest = placeMoveResponse.contestResponse
 
 print(f'\n\nPlayer 1 Game State:\n{str(placeMoveResponse.contestResponse)}')
@@ -44,7 +44,7 @@ player2Contest = _service.GetContest(player2Contest.contestId, player2Contest.pl
 placeMoveResponse = _service.PlaceMove(player2Contest.contestId, player2Contest.currentGameId, player2Contest.playerId, 'ROCK') #REQUEST SERVER TO PLACE MOVE
 player2Contest = placeMoveResponse.contestResponse
 
-placeMoveResponse = _service.PlaceMove(player1Contest.contestId, player1Contest.currentGameId, player1Contest.playerId, 'PAPER')
+placeMoveResponse = _service.PlaceMove(player1Contest.contestId, player1Contest.currentGameId, player1Contest.playerId, 'PAPER') #REQUEST SERVER TO PLACE MOVE
 player1Contest = placeMoveResponse.contestResponse
 
 print(f'\n\nPlayer 1 Game State:\n{str(placeMoveResponse.contestResponse)}')
@@ -55,7 +55,7 @@ placeMoveResponse = _service.PlaceMove(player2Contest.contestId, player2Contest.
 player2Contest = placeMoveResponse.contestResponse
 print(f'\n\nPlayer 2 Game State:\n{str(placeMoveResponse.contestResponse)}')
 
-placeMoveResponse = _service.PlaceMove(player1Contest.contestId, player1Contest.currentGameId, player1Contest.playerId, 'ROCK')
+placeMoveResponse = _service.PlaceMove(player1Contest.contestId, player1Contest.currentGameId, player1Contest.playerId, 'ROCK') #REQUEST SERVER TO PLACE MOVE
 player1Contest = placeMoveResponse.contestResponse
 
 print(f'\n\nPlayer 1 Game State:\n{str(placeMoveResponse.contestResponse)}')
@@ -66,7 +66,7 @@ placeMoveResponse = _service.PlaceMove(player2Contest.contestId, player2Contest.
 player2Contest = placeMoveResponse.contestResponse
 
 
-placeMoveResponse = _service.PlaceMove(player1Contest.contestId, player1Contest.currentGameId, player1Contest.playerId, 'SCISORS')
+placeMoveResponse = _service.PlaceMove(player1Contest.contestId, player1Contest.currentGameId, player1Contest.playerId, 'SCISORS') #REQUEST SERVER TO PLACE MOVE
 player1Contest = placeMoveResponse.contestResponse
 
 print(f'\n\nPlayer 1 Game State:\n{str(placeMoveResponse.contestResponse)}')
@@ -76,17 +76,17 @@ placeMoveResponse = _service.PlaceMove(player2Contest.contestId, player2Contest.
 player2Contest = placeMoveResponse.contestResponse
 
 
-placeMoveResponse = _service.PlaceMove(player1Contest.contestId, player1Contest.currentGameId, player1Contest.playerId, 'PAPER')
+placeMoveResponse = _service.PlaceMove(player1Contest.contestId, player1Contest.currentGameId, player1Contest.playerId, 'PAPER') #REQUEST SERVER TO PLACE MOVE
 player1Contest = placeMoveResponse.contestResponse
 
 print(f'\n\nPlayer 1 Game State:\n{str(placeMoveResponse.contestResponse)}')
 
 
 player2Contest = _service.GetContest(player2Contest.contestId, player2Contest.playerId)
-placeMoveResponse = _service.PlaceMove(player2Contest.contestId, player2Contest.currentGameId, player2Contest.playerId, 'SCISORS')
+placeMoveResponse = _service.PlaceMove(player2Contest.contestId, player2Contest.currentGameId, player2Contest.playerId, 'SCISORS') #REQUEST SERVER TO PLACE MOVE
 player2Contest = placeMoveResponse.contestResponse
 
-placeMoveResponse = _service.PlaceMove(player1Contest.contestId, player1Contest.currentGameId, player1Contest.playerId, 'PAPER')
+placeMoveResponse = _service.PlaceMove(player1Contest.contestId, player1Contest.currentGameId, player1Contest.playerId, 'PAPER') #REQUEST SERVER TO PLACE MOVE
 player1Contest = placeMoveResponse.contestResponse
 
 print(f'\n\nPlayer 1 Game State:\n{str(placeMoveResponse.contestResponse)}')
