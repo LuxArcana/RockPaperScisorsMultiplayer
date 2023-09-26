@@ -37,6 +37,7 @@ class Contest:
       game = Game(self.players, self.gameType, self.oponentType)
       self.games.update({game.gameId: game})
       self.currentGameId = game.gameId
+      self.contestState = 'PLAYING'
 
 
   
