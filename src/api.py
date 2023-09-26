@@ -207,5 +207,6 @@ def PostMoveToGame(rawContestId: str, rawGameId: str, rawPlayerId: str, moveName
 
 
 
-
-app.run() #example doesn't include this, but it is here to run from debug.  needs research
+if __name__ == '__main__':
+    print('Starting From Main Not Flask')
+    app.run() #example doesn't include this, but it is here to run from debug.  needs research
