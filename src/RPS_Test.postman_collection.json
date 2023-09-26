@@ -1,0 +1,407 @@
+{
+	"info": {
+		"_postman_id": "c380246a-23be-42b0-84ae-9e9427324400",
+		"name": "RPS_Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10320243"
+	},
+	"item": [
+		{
+			"name": "TEST",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}:{{port}}/{{base_url}}/test",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{base_url}}",
+						"test"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST contest",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = JSON.parse(responseBody);\r",
+							"\r",
+							"const contestId = jsonData?.contestId;\r",
+							"pm.collectionVariables.set(\"contestId\",contestId);\r",
+							"\r",
+							"const player1Id = jsonData?.playerId;\r",
+							"pm.collectionVariables.set(\"player1Id\", player1Id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"contestName\": \"web test\",\r\n    \"roundsToWin\": 3,\r\n    \"gameType\": \"ROCK_PAPER_SCISORS\",\r\n    \"oponentType\": \"pvp\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/{{base_url}}/contest",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{base_url}}",
+						"contest"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Contest List",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}:{{port}}/{{base_url}}/contests",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{base_url}}",
+						"contests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Contest",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}:{{port}}/{{base_url}}/contest/{{contestId}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{base_url}}",
+						"contest",
+						"{{contestId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Contest Player 1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}:{{port}}/{{base_url}}/contest/{{contestId}}/player/{{player1Id}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{base_url}}",
+						"contest",
+						"{{contestId}}",
+						"player",
+						"{{player1Id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Contest Player 2",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}:{{port}}/{{base_url}}/contest/{{contestId}}/player/{{player2Id}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{base_url}}",
+						"contest",
+						"{{contestId}}",
+						"player",
+						"{{player2Id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Join Contest",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = JSON.parse(responseBody);\r",
+							"\r",
+							"const player2Id = jsonData?.playerId;\r",
+							"pm.collectionVariables.set(\"player2Id\", player2Id);\r",
+							"\r",
+							"const gameId = jsonData?.currentGameId;\r",
+							"pm.collectionVariables.set(\"gameId\", gameId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{host}}:{{port}}/{{base_url}}/contest/{{contestId}}/join",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{base_url}}",
+						"contest",
+						"{{contestId}}",
+						"join"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Move Player1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = JSON.parse(responseBody);\r",
+							"\r",
+							"const gameId = jsonData?.contestResponse.currentGameId;\r",
+							"pm.collectionVariables.set(\"gameId\", gameId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{host}}:{{port}}/{{base_url}}/contest/{{contestId}}/game/{{gameId}}/player/{{player1Id}}/{{player1Move}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{base_url}}",
+						"contest",
+						"{{contestId}}",
+						"game",
+						"{{gameId}}",
+						"player",
+						"{{player1Id}}",
+						"{{player1Move}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Move Player 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = JSON.parse(responseBody);\r",
+							"\r",
+							"const gameId = jsonData?.contestResponse.currentGameId;\r",
+							"pm.collectionVariables.set(\"gameId\", gameId);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{host}}:{{port}}/{{base_url}}/contest/{{contestId}}/game/{{gameId}}/player/{{player2Id}}/{{player2Move}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{base_url}}",
+						"contest",
+						"{{contestId}}",
+						"game",
+						"{{gameId}}",
+						"player",
+						"{{player2Id}}",
+						"{{player2Move}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Contest PVE",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = JSON.parse(responseBody);\r",
+							"\r",
+							"const contestId = jsonData?.contestId;\r",
+							"pm.collectionVariables.set(\"contestId\",contestId);\r",
+							"\r",
+							"const player1Id = jsonData?.playerId;\r",
+							"pm.collectionVariables.set(\"player1Id\", player1Id);\r",
+							"\r",
+							"const gameId = jsonData?.currentGameId;\r",
+							"pm.collectionVariables.set(\"gameId\", gameId);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"contestName\": \"web test\",\r\n    \"roundsToWin\": 3,\r\n    \"gameType\": \"ROCK_PAPER_SCISORS\",\r\n    \"oponentType\": \"pve\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/{{base_url}}/contest",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"{{base_url}}",
+						"contest"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "contestId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "gameId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "player1Id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "player2Id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "player1Move",
+			"value": "PAPER",
+			"type": "string"
+		},
+		{
+			"key": "player2Move",
+			"value": "ROCK",
+			"type": "string"
+		},
+		{
+			"key": "host",
+			"value": "127.0.0.1",
+			"type": "string"
+		},
+		{
+			"key": "port",
+			"value": "88",
+			"type": "string"
+		},
+		{
+			"key": "base_url",
+			"value": "rpsapi/api/v1",
+			"type": "string"
+		}
+	]
+}
