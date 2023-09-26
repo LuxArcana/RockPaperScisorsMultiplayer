@@ -8,7 +8,7 @@ from Service.RockPaperScisorsService import *
 
 app = Flask(__name__)
 
-
+print(__name__)
 #main service to handel game logic
 _service = RockPaperScisorsService()
 
@@ -18,7 +18,7 @@ _service = RockPaperScisorsService()
 
 
 #test route to check health of api
-@app.route('/test', methods=['GET'])
+@app.route('/api/v1/test', methods=['GET'])
 def test():
     response = make_response(f'{{"message":"OK"}}', 200)
     response.headers.add('Content-Type', 'application/json')

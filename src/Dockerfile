@@ -2,12 +2,12 @@ FROM python:3.11-slim-buster
 
 WORKDIR /app
 
-COPY requirements.text ./
+COPY requirements.txt ./
 
-RUN pip install -r requirements.text
+RUN pip install -r requirements.txt
 
 COPY . .
 
-EXPOSE 4000
+EXPOSE 5000
 
-CMD ["flask", "run", "--host=0.0.0.0", "--port=4000"]
+CMD ["gunicorn", "-w 1", "-b 0.0.0.0:5000", "apiserver:app"]
