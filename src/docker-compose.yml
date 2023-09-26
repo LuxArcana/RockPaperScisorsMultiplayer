@@ -9,8 +9,7 @@ services:
       - "5000"
     networks:
       - my-rps-network
-    environment:
-      - FLASK_APP=api.py
+
   
   nginx:
     container_name: production_nginx
