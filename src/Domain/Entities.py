@@ -64,11 +64,12 @@ class Contest:
       for scoreGameId in self.games:
         scoreGame = self.games[scoreGameId]
         if scoreGame.gameState == 'COMPLETE':
-          if scoreGame.winningPlayerId in score:
-            playerScore = score[scoreGame.winningPlayerId] + 1
-            score.update({scoreGame.winningPlayerId: playerScore})
-          else:
-            score.update({scoreGame.winningPlayerId: 1})
+          if scoreGame.winningPlayerId is not None:
+            if scoreGame.winningPlayerId in score:
+              playerScore = score[scoreGame.winningPlayerId] + 1
+              score.update({scoreGame.winningPlayerId: playerScore})
+            else:
+              score.update({scoreGame.winningPlayerId: 1})
           
           
       

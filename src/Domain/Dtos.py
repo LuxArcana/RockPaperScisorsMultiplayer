@@ -8,6 +8,15 @@ class CreateContestRequestDto:
     self.gameType: str = gameType
     self.oponentType: str = oponentType
 
+  def __repr__(self):
+    return f'{{"contestName":"{self.contestName}","roundsToWin":{self.roundsToWin},"gameType":"{self.gameType}","oponentType":"{self.oponentType}"}}'
+  
+  def __str__(self):
+    return self.__repr__()
+  
+  def to_json(self):
+    return self.__repr__()
+
 
 
 
@@ -64,7 +73,7 @@ class ContestListResponseDto:
     output: str = f'{{"contestList": ['
     delimiter: str = ''
     for contestId in self.contestList:
-      output = f'{output}{delimiter}{self.contestList[contestId].to_json()},'
+      output = f'{output}{delimiter}{self.contestList[contestId].to_json()}'
       delimiter = ','
 
     return f'{output}]}}'
