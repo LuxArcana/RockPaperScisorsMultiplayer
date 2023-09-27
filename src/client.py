@@ -190,6 +190,19 @@ def PlayContest(apiConsumer: RockPaperScisorsApiConsumer, contestDtoDict: dict):
 
 
 
+def Menu_GameType() -> str:
+    return 'ROCK_PAPER_SCISORS'
+
+def Menu_OponentType() -> str:
+    return 'PVE'
+
+def Menu_RoundsToWin() -> int:
+    return 3
+
+def Menu_ContestName() -> str:
+    return 'Test Client'
+
+
 
 
 apiConsumer: RockPaperScisorsApiConsumer = RockPaperScisorsApiConsumer("http://127.0.0.1:88/rpsapi/api/v1/", "x")
@@ -207,8 +220,7 @@ while keepPlaying:
     contestList = apiConsumer.GetContestList()
     actionGuid: uuid = Menu_Main(BuildMainMenuItems(contestList, createContestGuid, refreshListGuid, exitGameGuid))
     if actionGuid == createContestGuid:
-        #do sub menu here
-        contestDtoDict = apiConsumer.CreateContest('clientTest', 3, 'ROCK_PAPER_SCISORS', 'PVE')
+        contestDtoDict = apiConsumer.CreateContest(Menu_ContestName(), Menu_RoundsToWin() , Menu_GameType(), Menu_OponentType())
     elif actionGuid == exitGameGuid:
         keepPlaying = False
     elif actionGuid == refreshListGuid or actionGuid is None:
