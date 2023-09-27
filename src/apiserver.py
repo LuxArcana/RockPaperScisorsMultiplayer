@@ -8,7 +8,7 @@ from Service.RockPaperScisorsService import *
 
 app = Flask(__name__)
 
-print(__name__)
+
 #main service to handel game logic
 _service = RockPaperScisorsService()
 
@@ -42,6 +42,7 @@ def GetContests():
 @app.route('/api/v1/contest/<rawContestId>', methods=['GET'])
 def GetContest(rawContestId: str):
     try:
+
         if rawContestId == 'null':
             raise ContestNotFoundException
     
@@ -49,10 +50,12 @@ def GetContest(rawContestId: str):
         response = make_response(_service.GetContest(contestId, None).to_json(), 200)
         response.headers.add('Content-Type', 'application/json')
         return response
+    
     except ContestNotFoundException:
         response = make_response(f'{{"error":"ContestNotFoundException"}}', 404)
         response.headers.add('Content-Type', 'application/json')
         return response
+    
     except ValueError:
         response = make_response(f'{{"error":"ValueError","message":"Could Not Parse Provided contestId |{rawContestId}| into a GUID"}}', 400)
         response.headers.add('Content-Type', 'application/json')
@@ -66,6 +69,7 @@ def GetContest(rawContestId: str):
 @app.route('/api/v1/contest/<rawContestId>/player/<rawPlayerId>', methods=['GET'])
 def GetContestAsPlayer(rawContestId: str, rawPlayerId: str):
     try:
+
         if rawContestId == 'null':
             raise ContestNotFoundException
         
@@ -78,14 +82,17 @@ def GetContestAsPlayer(rawContestId: str, rawPlayerId: str):
         response = make_response(_service.GetContest(contestId, playerId).to_json(), 200)
         response.headers.add('Content-Type', 'application/json')
         return response
+    
     except ContestNotFoundException:
         response = make_response(f'{{"error":"ContestNotFoundException"}}', 404)
         response.headers.add('Content-Type', 'application/json')
         return response
+    
     except PlayerNotFoundException:
         response = make_response(f'{{"error":"PlayerNotFoundException"}}', 404)
         response.headers.add('Content-Type', 'application/json')
         return response
+    
     except ValueError:
         response = make_response(f'{{"error":"ValueError","message":"Could Not Parse Provided contestId |{rawContestId}| or playerId |{rawPlayerId}| into a GUID"}}', 400)
         response.headers.add('Content-Type', 'application/json')
@@ -100,21 +107,27 @@ def PostNewContest():
     contestRequest = None
 
     try:
+
         data = request.get_json()
         contestRequest = CreateContestRequestDto(data['contestName'], data['roundsToWin'], data['gameType'], data['oponentType'])
+
     except:
         response = make_response(f'{{"error":"ValueError","message":"Could Not Parse Provided Request JSON"}}', 400)
         response.headers.add('Content-Type', 'application/json')
         return response
     
+
     try:
+
         response = make_response(_service.CreateContest(contestRequest).to_json(), 200)
         response.headers.add('Content-Type', 'application/json')
         return response
+    
     except InvalidGameTypeException:
         response = make_response(f'{{"error":"InvalidGameTypeException"}}', 400)
         response.headers.add('Content-Type', 'application/json')
         return response
+    
     except InvalidOponentTypeException:
         response = make_response(f'{{"error":"InvalidOponentTypeException"}}', 400)
         response.headers.add('Content-Type', 'application/json')
@@ -127,6 +140,7 @@ def PostNewContest():
 @app.route('/api/v1/contest/<rawContestId>/join', methods=['POST'])
 def JoinContest(rawContestId: str):
     try:
+
         if rawContestId == 'null':
             raise ContestNotFoundException
         
@@ -134,10 +148,12 @@ def JoinContest(rawContestId: str):
         response = make_response(_service.JoinContest(contestId).to_json(), 200)
         response.headers.add('Content-Type', 'application/json')
         return response
+    
     except ContestNotFoundException:
         response = make_response(f'{{"error":"ContestNotFoundException"}}', 404)
         response.headers.add('Content-Type', 'application/json')
         return response
+    
     except ValueError:
         response = make_response(f'{{"error":"ValueError","message":"Could Not Parse Provided contestId |{rawContestId}| into a GUID"}}', 400)
         response.headers.add('Content-Type', 'application/json')
@@ -150,6 +166,7 @@ def JoinContest(rawContestId: str):
 @app.route('/api/v1/contest/<rawContestId>/game/<rawGameId>/player/<rawPlayerId>/<moveName>', methods=['POST'])
 def PostMoveToGame(rawContestId: str, rawGameId: str, rawPlayerId: str, moveName: str):
     try:
+
         if rawContestId == 'null':
             raise ContestNotFoundException
         
@@ -206,7 +223,7 @@ def PostMoveToGame(rawContestId: str, rawGameId: str, rawPlayerId: str, moveName
 
 
 
-
+#start the web service manually if this was launched directly instead of from WSGI
 if __name__ == '__main__':
     print('Starting From Main Not Flask')
-    app.run() #example doesn't include this, but it is here to run from debug.  needs research
+    app.run()
