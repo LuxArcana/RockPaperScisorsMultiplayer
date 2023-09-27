@@ -158,8 +158,8 @@ def PlayContest(apiConsumer: RockPaperScisorsApiConsumer, contestDtoDict: dict):
         contestDtoDict = apiConsumer.GetContestAsPlayer(contestDtoDict["contestId"], contestDtoDict["playerId"])
         print('.', end='')
 
-    keepPlaying = True
-    while keepPlaying:
+    
+    while contestDtoDict["contestState"] == 'PLAYING':
         (gameDtoDict, contestDtoDict) = apiConsumer.PostMove(contestDtoDict, Menu_GetMove(contestDtoDict["gameType"]))
         print(f'{gameDtoDict}\n')
 
@@ -178,10 +178,6 @@ def PlayContest(apiConsumer: RockPaperScisorsApiConsumer, contestDtoDict: dict):
             print('.',end='')
             time.sleep(1)
         print(f'\n{gameDtoDict}\n')
-
-        
-        if contestDtoDict["contestState"] != 'PLAYING':
-            keepPlaying = False
             
 
 
