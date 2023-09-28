@@ -9,3 +9,11 @@ docker compose up
 
 to stop docker image server
 docker compose down
+
+
+
+
+
+TODO: player move timeout.
+    allow contest creator to set the maximum time to wait for a player move
+    when this time is exceeded, the host service will set the move to none for any players that have not yet made a move

@@ -206,6 +206,8 @@ def CancelContest(rawContestId: str, rawPlayerId: str):
         return response
 
 
+
+
 #post a move to a game
 @app.route('/api/v1/contest/<rawContestId>/game/<rawGameId>/player/<rawPlayerId>/<moveName>', methods=['POST'])
 def PostMoveToGame(rawContestId: str, rawGameId: str, rawPlayerId: str, moveName: str):
@@ -269,5 +271,5 @@ def PostMoveToGame(rawContestId: str, rawGameId: str, rawPlayerId: str, moveName
 
 #start the web service manually if this was launched directly instead of from WSGI
 if __name__ == '__main__':
-    print('Starting From Main Not Flask')
+    print('Starting From Main Not WSGI')
     app.run()
