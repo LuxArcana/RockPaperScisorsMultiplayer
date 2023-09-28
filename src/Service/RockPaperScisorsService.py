@@ -30,8 +30,19 @@ class RockPaperScisorsService:
         
         targetContest: Contest = self.contests[contestId]
         
-        return targetContest.JoinContest()
+        return targetContest.Join()
 
+
+
+    def CancelContest(self, contestId: uuid, playerId: uuid) -> ContestResponseDto:
+        if not contestId in self.contests:
+            raise ContestNotFoundException
+        
+        targetContest: Contest = self.contests[contestId]
+        
+        return targetContest.Cancel(playerId)
+
+        
 
 
     def GetContest(self, contestId: uuid, playerId: uuid) -> ContestResponseDto:

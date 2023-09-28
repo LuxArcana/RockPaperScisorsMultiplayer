@@ -162,6 +162,50 @@ def JoinContest(rawContestId: str):
 
 
 
+#cancel a contest
+@app.route('/api/v1/contest/<rawContestId>/player/<rawPlayerId>/cancel', methods=['PATCH'])
+def CancelContest(rawContestId: str, rawPlayerId: str):
+    try:
+        if rawContestId == 'null':
+            raise ContestNotFoundException
+        
+        if rawPlayerId == 'null':
+            raise PlayerNotFoundException
+        
+        contestId: uuid = uuid.UUID(rawContestId)
+        playerId: uuid = uuid.UUID(rawPlayerId)
+
+        response = make_response(_service.CancelContest(contestId, playerId).to_json(), 200)
+        response.headers.add('Content-Type', 'application/json')
+        return response
+
+
+    except ContestNotFoundException:
+        response = make_response(f'{{"error":"ContestNotFoundException"}}', 404)
+        response.headers.add('Content-Type', 'application/json')
+        return response
+
+    except PlayerNotFoundException:
+        response = make_response(f'{{"error":"PlayerNotFoundException"}}', 404)
+        response.headers.add('Content-Type', 'application/json')
+        return response
+
+    except CancelContestNotAllowed:
+        response = make_response(f'{{"error":"CancelContestNotAllowed"}}', 403)
+        response.headers.add('Content-Type', 'application/json')
+        return response
+    
+    except ValueError:
+        response = make_response(f'{{"error":"ValueError","message":"Could Not Parse Provided contestId |{rawContestId}| or playerId |{rawPlayerId}| into a GUID"}}', 400)
+        response.headers.add('Content-Type', 'application/json')
+        return response
+    
+    except Exception as e:
+        response = make_response(f'{{"error":"Exception","message":"{e.args[0]}"}}', 500)
+        response.headers.add('Content-Type', 'application/json')
+        return response
+
+
 #post a move to a game
 @app.route('/api/v1/contest/<rawContestId>/game/<rawGameId>/player/<rawPlayerId>/<moveName>', methods=['POST'])
 def PostMoveToGame(rawContestId: str, rawGameId: str, rawPlayerId: str, moveName: str):

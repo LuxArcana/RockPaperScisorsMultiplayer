@@ -18,3 +18,6 @@ class InvalidGameTypeException(Exception):
 
 class InvalidOponentTypeException(Exception):
     pass
+
+class CancelContestNotAllowed(Exception):
+    pass

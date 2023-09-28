@@ -41,7 +41,7 @@ class Contest:
 
 
   
-  def JoinContest (self) -> ContestResponseDto:
+  def Join (self) -> ContestResponseDto:
     #state checking here for now accept all
     playerId = uuid.uuid4()
     self.players.append(playerId)
@@ -50,7 +50,22 @@ class Contest:
     self.games.update({game.gameId: game})
     self.currentGameId = game.gameId
     return ContestResponseDto(self, playerId)
-    
+
+
+
+  def Cancel(self, playerId: uuid) -> ContestResponseDto:
+
+    if self.contestState != 'WAIT_FOR_PLAYER_JOIN':
+      raise CancelContestNotAllowed
+
+    if not playerId in self.players:
+      raise PlayerNotFoundException
+
+    self.contestState = 'CANCELED'
+    return ContestResponseDto(self, playerId)
+
+
+
   def PlaceMove (self, gameId: uuid, playerMove) -> PlaceMoveResponseDto:
     if not gameId in self.games:
       raise GameNotFoundException
