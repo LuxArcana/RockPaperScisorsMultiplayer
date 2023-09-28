@@ -1,3 +1,4 @@
+from os import system
 from Service.RockPaperScisorsApiConsumer import *
 
 
@@ -158,7 +159,8 @@ class RockpaperScisorsConsoleUI:
 
 
     def PlayContest(self, contestDtoDict: dict):
-        
+        self.DisplayContest(contestDtoDict)
+
         while contestDtoDict["contestState"] == 'WAIT_FOR_PLAYER_JOIN':
             print('Waiting For Player To Join')
             self.apiConsumer.WaitForContestStateChangeFrom(contestDtoDict, 'WAIT_FOR_PLAYER_JOIN', self.waitForOponentJoinTimeoutSeconds)
@@ -171,7 +173,7 @@ class RockpaperScisorsConsoleUI:
         
         while contestDtoDict["contestState"] == 'PLAYING':
             (gameDtoDict, contestDtoDict) = self.apiConsumer.PostMove(contestDtoDict, self.Menu_GetMove(contestDtoDict["gameType"]))
-            print(f'{gameDtoDict}\n')
+            self.DisplayContest(contestDtoDict)
 
             gameState: str = gameDtoDict["gameState"]
             gameId: str = gameDtoDict["gameId"]
@@ -181,12 +183,45 @@ class RockpaperScisorsConsoleUI:
                 if gameDtoDict["gameState"] != "COMPLETE":
                     print("GAME IS BROKEN") #THIS SHOULD NOT HAPPEN AFTER MOVE COUNTDOWNS ARE IMPLIMENTED
                     return
-            
-            print(f'\n{gameDtoDict}\n')
                 
-        print(contestDtoDict)
+        self.DisplayContest(contestDtoDict)
         input('Press Enter To Return To The Main Menu\n')
 
+
+
+
+    def DisplayContest(self, contestDtoDict: dict):
+        contestName: str = str(contestDtoDict["contestName"]) 
+        gameType: str = str(contestDtoDict["gameType"])
+        oponentType: str = str(contestDtoDict["oponentType"])
+        roundsToWin: str = str(contestDtoDict["roundsToWin"])
+        winner: str = str(contestDtoDict["winningPlayer"])
+        y:str = ""
+        x: str = str(y)
+
+        #system('clear')
+        print( '/================================================\\')
+        print( '|  Contest Name:   {: <30}|'.format(contestName))
+        print( '|  Game Type:      {: <30}|'.format(gameType))
+        #print( '|  Oponent Type:   {: <30}|').format(oponentType)
+        #print( '|  Rounds To Win:  {: <30}|').format(roundsToWin)
+        #print( '|                  {: <30}|').format(varSpace)
+        #print( '|  Winner:         {: <30}|').format(winner)
+        #print( '|                  {: <30}|').format(varSpace)
+        #print( '|-----------\\     {: <30}|').format(varSpace)
+        #print( '|   Games   |      {: <30}|').format(x)
+        print( '|------------------------------------------------|')
+        print( '|  State   | Your Move | Their Move |   Winner   |')
+        print( '|------------------------------------------------|')
+        
+        for game in contestDtoDict["games"]:
+            state: str = str(game["gameState"]).format(width=7, align="center")
+            uMove: str = str(game["yourMove"]).format(width=7, align="center")
+            oMove: str = str(game["opponentMove"]).format(width=7, align="center")
+            winer: str = str(game["winner"]).format(width=7, align="center")
+            print(f'|  {state} |  {uMove}  |  {oMove}   |   {winer}  |')
+
+        print('\\================================================/\n\n')
 
 
 
