@@ -153,10 +153,10 @@ def PlayContest(apiConsumer: RockPaperScisorsApiConsumer, contestDtoDict: dict):
     
     if contestDtoDict["contestState"] == "WAIT_FOR_PLAYER_JOIN":
         print('Waiting For Player To Join')
-    while contestDtoDict["contestState"] == "WAIT_FOR_PLAYER_JOIN":
-        time.sleep(1)
-        contestDtoDict = apiConsumer.GetContestAsPlayer(contestDtoDict["contestId"], contestDtoDict["playerId"])
-        print('.', end='')
+        while contestDtoDict["contestState"] == "WAIT_FOR_PLAYER_JOIN":
+            time.sleep(1)
+            contestDtoDict = apiConsumer.GetContestAsPlayer(contestDtoDict["contestId"], contestDtoDict["playerId"])
+            print('.', end='')
 
     
     while contestDtoDict["contestState"] == 'PLAYING':
@@ -186,21 +186,82 @@ def PlayContest(apiConsumer: RockPaperScisorsApiConsumer, contestDtoDict: dict):
 
 
 
+
+
 def Menu_GameType() -> str:
-    return 'ROCK_PAPER_SCISORS'
+
+    gameTypeName: str = None
+
+    while gameTypeName is None:
+        print ('\n\n-----------------------')
+        print ('++    Game Type      ++')
+        print ('-----------------------')
+        print('1)\tRock Paper Scisors')
+        print('2)\tRock Paper Scisors Lizard Spok\n')
+    
+        gameTypeMenuSelection = input("Choose A Game Type: ")
+
+        if gameTypeMenuSelection == '1':
+            gameTypeName ='ROCK_PAPER_SCISORS'
+        
+        if gameTypeMenuSelection == '2':
+            gameTypeName = 'ROCK_PAPER_SCISORS_LIZARD_SPOK'
+    
+    return gameTypeName
+
+
+
+
 
 def Menu_OponentType() -> str:
-    return 'PVE'
+    oponentTypeName: str = None
 
-def Menu_RoundsToWin() -> int:
-    return 3
+    while oponentTypeName is None:
+        print ('-----------------------')
+        print ('++    Oponent Type   ++')
+        print ('-----------------------')
+        print('1)\tHuman')
+        print('2)\tComputer\n')
+    
+        oponentTypeMenuSelection = input("Choose An Oponent Type: ")
+
+        if oponentTypeMenuSelection == '1':
+            oponentTypeName ='PVP'
+        
+        if oponentTypeMenuSelection == '2':
+            oponentTypeName = 'PVE'
+    
+    return oponentTypeName
+
+
+
+
+
+def Menu_RoundsToWin(maxRoundsToWin: int) -> int:
+    roundsToWin: int = None
+    while roundsToWin is None:
+        rawRoundsToWin: str = input(f'How Many Victories Are Required To Win Your Contest (Max: {maxRoundsToWin})? ')
+        try:
+            roundsToWin = int(rawRoundsToWin)
+        except:
+            roundsToWin = None
+    
+    return roundsToWin
+
+
+
 
 def Menu_ContestName() -> str:
-    return 'Test Client'
+    contestName: str = input('Enter A Name For Your Contest: ')
+    
+    if len(contestName) == 0:
+        contestName = 'NO CONTEST NAME'
+    
+    return contestName
 
 
 
-
+MAX_ROUNDS_TO_WIN: int = 9
 apiConsumer: RockPaperScisorsApiConsumer = RockPaperScisorsApiConsumer("http://127.0.0.1:88/rpsapi/api/v1/", "x")
 
 
@@ -216,7 +277,7 @@ while keepPlaying:
     contestList = apiConsumer.GetContestList()
     actionGuid: uuid = Menu_Main(BuildMainMenuItems(contestList, createContestGuid, refreshListGuid, exitGameGuid))
     if actionGuid == createContestGuid:
-        contestDtoDict = apiConsumer.CreateContest(Menu_ContestName(), Menu_RoundsToWin() , Menu_GameType(), Menu_OponentType())
+        contestDtoDict = apiConsumer.CreateContest(Menu_ContestName(), Menu_RoundsToWin(MAX_ROUNDS_TO_WIN) , Menu_GameType(), Menu_OponentType())
     elif actionGuid == exitGameGuid:
         keepPlaying = False
     elif actionGuid == refreshListGuid or actionGuid is None:
