@@ -19,6 +19,10 @@ TODO: player move timeout.
     when this time is exceeded, the host service will set the move to none for any players that have not yet made a move
 
 TODO:
+    Factor Out Magic Strings
+    mostly gameState and contestState values
+
+TODO:
     refactor RockPaperScisorsConsoleUI.PlayContest
     this method is to long
 
