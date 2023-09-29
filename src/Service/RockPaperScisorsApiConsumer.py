@@ -16,6 +16,44 @@ class RockPaperScisorsApiConsumer:
 
 
 
+
+    def CatchErrorResponse(self, response):
+        if response.status_code != 200:
+            try:
+                errDict = response.json()
+
+                if errDict["error"] == "ContestNotFoundException":
+                    raise ContestNotFoundException
+
+                if errDict["error"] == "PlayerNotFoundException":
+                    raise PlayerNotFoundException
+                
+                if errDict["error"] == "InvalidGameTypeException":
+                    raise InvalidGameTypeException
+                
+                if errDict["error"] == "InvalidOponentTypeException":
+                    raise InvalidOponentTypeException
+                
+                if errDict["error"] == "ContestFullException":
+                    raise ContestFullException
+                
+                if errDict["error"] == "CancelContestNotAllowed":
+                    raise CancelContestNotAllowed
+                
+                if errDict["error"] == "GameNotFoundException":
+                    raise GameNotFoundException
+                
+                if errDict["error"] == "InvalidMoveException":
+                    raise InvalidMoveException
+
+                raise Exception(f'error: {errDict["error"]}, message: {errDict["message"]}')
+            
+            except Exception as e:
+                raise e
+
+
+
+
     def ServerStatus(self) -> str:
         response = requests.get(f'{self.apiBaseUrl}test', headers=self.headers)
         if response.status_code != 200:
@@ -27,24 +65,21 @@ class RockPaperScisorsApiConsumer:
 
     def GetContestList(self) -> dict:
         response = requests.get(f'{self.apiBaseUrl}contests', headers=self.headers)
-        if response.status_code != 200:
-            return None #throw exception later
+        self.CatchErrorResponse(response)
         return response.json()["contestList"]
 
 
 
     def GetContest(self, contestId: str) -> dict:
         response = requests.get(f'{self.apiBaseUrl}contest/{contestId}', headers=self.headers)
-        if response.status_code != 200:
-            return None #throw exception later
+        self.CatchErrorResponse(response)
         return response.json()
 
 
 
     def GetContestAsPlayer(self, contestId: str, playerId: str) -> dict:
         response = requests.get(f'{self.apiBaseUrl}contest/{contestId}/player/{playerId}', headers=self.headers)
-        if response.status_code != 200:
-            return None #throw exception later
+        self.CatchErrorResponse(response)
         return response.json()
 
 
@@ -52,24 +87,21 @@ class RockPaperScisorsApiConsumer:
     def CreateContest(self, contestName: str, roundsToWin: int, gameType: str, oponentType: str) -> dict:
         requestContent = CreateContestRequestDto(contestName, roundsToWin, gameType, oponentType)
         response = requests.post(f'{self.apiBaseUrl}contest', data = requestContent.to_json(), headers=self.headers)
-        if response.status_code != 200:
-            return None #throw exception later
+        self.CatchErrorResponse(response)
         return response.json()
         
 
 
     def JoinContest(self, contestId: str) -> dict:
         response = requests.post(f'{self.apiBaseUrl}contest/{contestId}/join', headers=self.headers)
-        if response.status_code != 200:
-            return None #throw exception later
+        self.CatchErrorResponse(response)
         return response.json()
 
 
 
     def CancelContest(self, contestId: str, playerId: str,) -> dict:
         response = requests.patch(f'{self.apiBaseUrl}contest/{contestId}/player/{playerId}/cancel', headers=self.headers)
-        if response.status_code != 200:
-            return None #throw exception later
+        self.CatchErrorResponse(response)
         return response.json()
 
 
@@ -80,6 +112,8 @@ class RockPaperScisorsApiConsumer:
         gameId = contestDtoDict["currentGameId"]
 
         response = requests.post(f'{self.apiBaseUrl}contest/{contestId}/game/{gameId}/player/{playerId}/{moveName}', headers=self.headers)
+        self.CatchErrorResponse(response)
+
         responseDict = response.json()
 
         gameDtoDict = responseDict["gameResponse"]
