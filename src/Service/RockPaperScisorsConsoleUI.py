@@ -20,36 +20,50 @@ class RockpaperScisorsConsoleUI:
 
     def Menu_Main(self, menuItems: dict) -> uuid:
         actionGuid: uuid = None
-        #system('cls')
-        menuHeader: str = '\n\n-----------------------\nMain Menu\n-----------------------'
+
+        system('cls')
+        errorHeader: str = ''
 
         while actionGuid is None:
-            print(menuHeader)
+            system('cls')
+            print(errorHeader)
+            print( '/========================================================================================================\\')
+            print(f'|{"MAIN MENU":^104}|')
+            print( '|========================================================================================================|')
+            print( '|{0:^5}| {1:31}|{2:^32}|{3:^9}| {4:21}|'.format('', 'Name', 'Type', 'Oponent','Status'))
+            print( '|-----+--------------------------------+--------------------------------+---------+----------------------|')
+
             for menuItem in menuItems:
                 menuText: str = menuItems[menuItem][0]
-                print(f'{menuItem})\t{menuText}')
+                if menuItem == 'C':
+                    print( '|-----+--------------------------------------------------------------------------------------------------|')
+                print(menuText)
             
+            print('\\========================================================================================================/')
+
             menuSelection: str = input('\nChoose An Option: ').upper()
 
             if menuSelection in menuItems:
                 actionGuid = menuItems[menuSelection][1]
             else:
-                menuHeader = '\n\n-----------------------\nINVALID SELECTION\nMain Menu\n-----------------------'
+                menuHeader = '\n### INVALID SELECTION, TRY AGAIN ###'
                 
         return actionGuid
 
 
 
     def Menu_GameType(self) -> str:
-
         gameTypeName: str = None
+        errorHeader: str = ''
 
         while gameTypeName is None:
-            print ('\n\n-----------------------')
-            print ('++    Game Type      ++')
-            print ('-----------------------')
-            print('1)\tRock Paper Scisors')
-            print('2)\tRock Paper Scisors Lizard Spok\n')
+            print(errorHeader)
+            print( ' -------------------------------------')
+            print(f'|{"Game Types":^37}|')
+            print( '|-------------------------------------|')
+            print( '| 1 |  Rock Paper Scisors             |')
+            print( '| 2 |  Rock Paper Scisors Lizard Spok |')
+            print( ' -------------------------------------')
         
             gameTypeMenuSelection = input("Choose A Game Type: ")
 
@@ -58,6 +72,9 @@ class RockpaperScisorsConsoleUI:
             
             if gameTypeMenuSelection == '2':
                 gameTypeName = 'ROCK_PAPER_SCISORS_LIZARD_SPOK'
+
+            if gameTypeName == '':
+                errorHeader = errorHeader = '\n\n### INVALID OPONENT, TRY AGAIN ###'
         
         return gameTypeName
 
@@ -65,14 +82,16 @@ class RockpaperScisorsConsoleUI:
 
     def Menu_OponentType(self) -> str:
         oponentTypeName: str = None
+        errorHeader: str = ''
 
         while oponentTypeName is None:
-            print ('-----------------------')
-            print ('++    Oponent Type   ++')
-            print ('-----------------------')
-            print('1)\tHuman')
-            print('2)\tComputer\n')
-        
+            print(errorHeader)
+            print( ' ------------------------------')
+            print(f'|{"Oponent Types":^30}|')
+            print( '|------------------------------|')
+            print( '| 1 |  Human                   |')
+            print( '| 2 |  Computer                |')
+            print( ' ------------------------------')
             oponentTypeMenuSelection = input("Choose An Oponent Type: ")
 
             if oponentTypeMenuSelection == '1':
@@ -80,6 +99,9 @@ class RockpaperScisorsConsoleUI:
             
             if oponentTypeMenuSelection == '2':
                 oponentTypeName = 'PVE'
+
+            if oponentTypeName == '':
+                errorHeader = errorHeader = '\n\n### INVALID OPONENT, TRY AGAIN ###'
         
         return oponentTypeName
 
@@ -104,41 +126,45 @@ class RockpaperScisorsConsoleUI:
         if len(contestName) == 0:
             contestName = 'NO CONTEST NAME'
         
-        return contestName
+        return contestName[:30]
 
 
 
     def Menu_GetMove(self, gameType: str) -> str:
         abrvMoves: str = 'R,P,S'
-        menuHeader: str = '\n\nMove Menu\n---------'
+        errorHeader: str = ''
         moveName: str = None
 
         while moveName is None:
-            #system('cls')
-            print(menuHeader)
-            print('R)\tRock')
-            print('P)\tPaper')
-            print('S)\tScisors')
+            print(errorHeader)
+            print( ' ------------------------------')
+            print(f'|{"Avaialbe Moves":^30}|')
+            print( '|------------------------------|')
+            print( '| R |  Rock                    |')
+            print( '| P |  Paper                   |')
+            print( '| S |  Scisors                 |')
+            
             if gameType == 'ROCK_PAPER_SCISORS_LIZARD_SPOK':
                 abrvMoves = 'R,P,S,L,K'
-                print('L)\tLizard')
-                print('K)\tspoK')
+                print( '| L |  Lizard                  |')
+                print( '| K |  Spok                    |')
+
+            print( ' ------------------------------')
 
             rawInput = input(f'Enter A Move ({abrvMoves}): ')
             move = MoveTokenBuilder.FromName(rawInput)
             if move is not None and move.Name != 'INVALID':
                 moveName = move.Name
             else:
-                menuHeader = '\n\n-----------------\nINVALID SELECTION\nTry Again\nMove Menu\n-----------------'
+                errorHeader = '\n\n### INVALID MOVE, TRY AGAIN ###'
 
         return moveName
 
 
 
 
-    def GetMenuDisplayTextFromContestDict(self, contest: dict) -> str:
-        return f'Name: {contest["contestName"]}\tType: {contest["gameType"]}\tOponent: {contest["oponentType"]}\tStatus: {contest["contestState"]}'
-
+    def GetMenuDisplayTextFromContestDict(self, contest: dict, menuIndex: int) -> str:
+        return f'|{menuIndex:^5}| {contest["contestName"]:31}|{contest["gameType"]:^32}|{contest["oponentType"]:^9}| {contest["contestState"]:21}|'
 
 
     def BuildMainMenuItems(self, contestList: dict) -> dict:
@@ -146,13 +172,19 @@ class RockpaperScisorsConsoleUI:
         menuIndex: int = 1
 
         for contestDict in contestList:
-            menuText: str = self.GetMenuDisplayTextFromContestDict(contestDict)
+            menuText: str = self.GetMenuDisplayTextFromContestDict(contestDict, menuIndex)
             menuItems.update({str(menuIndex): (menuText, contestDict["contestId"])})
             menuIndex += 1
 
-        menuItems.update({"C":("Create New Contest", self.createContestGuid)})
-        menuItems.update({"R":("Refresh Contests", self.refreshListGuid)})
-        menuItems.update({"X":("Exit Game", self.exitGameGuid)})
+        menuText = f'|{"C":^5}| {"Create New Contest":31}  {"":31} {"":^9}  {"":21}|'
+        menuItems.update({"C":(menuText, self.createContestGuid)})
+
+        menuText = f'|{"R":^5}| {"Refresh Contests":31}  {"":31} {"":^9}  {"":21}|'
+        menuItems.update({"R":(menuText, self.refreshListGuid)})
+
+        menuText = f'|{"X":^5}| {"Exit Game":31}  {"":31} {"":^9}  {"":21}|'
+        menuItems.update({"X":(menuText, self.exitGameGuid)})
+
         return menuItems
 
 
@@ -178,7 +210,7 @@ class RockpaperScisorsConsoleUI:
             gameState: str = gameDtoDict["gameState"]
             gameId: str = gameDtoDict["gameId"]
             if gameState != "COMPLETE":
-                print("Waiting For Oponent")
+                print("\nWaiting For Oponent To Move...")
                 (gameDtoDict, contestDtoDict) = self.apiConsumer.WaitForGameState(contestDtoDict, gameId, gameState, 'COMPLETE', self.waitForOponentMoveTimeoutSeconds)
                 if gameDtoDict["gameState"] != "COMPLETE":
                     print("GAME IS BROKEN") #THIS SHOULD NOT HAPPEN AFTER MOVE COUNTDOWNS ARE IMPLIMENTED
@@ -196,32 +228,32 @@ class RockpaperScisorsConsoleUI:
         oponentType: str = str(contestDtoDict["oponentType"])
         roundsToWin: str = str(contestDtoDict["roundsToWin"])
         winner: str = str(contestDtoDict["winningPlayer"])
-        y:str = ""
-        x: str = str(y)
 
-        #system('clear')
-        print( '/================================================\\')
-        print( '|  Contest Name:   {: <30}|'.format(contestName))
-        print( '|  Game Type:      {: <30}|'.format(gameType))
-        #print( '|  Oponent Type:   {: <30}|').format(oponentType)
-        #print( '|  Rounds To Win:  {: <30}|').format(roundsToWin)
-        #print( '|                  {: <30}|').format(varSpace)
-        #print( '|  Winner:         {: <30}|').format(winner)
-        #print( '|                  {: <30}|').format(varSpace)
-        #print( '|-----------\\     {: <30}|').format(varSpace)
-        #print( '|   Games   |      {: <30}|').format(x)
-        print( '|------------------------------------------------|')
-        print( '|  State   | Your Move | Their Move |   Winner   |')
-        print( '|------------------------------------------------|')
+        system('cls')
+        print( '/=================================================\\')
+        print( '|  Contest Name:   {0:30} |'.format(contestName))
+        print( '|  Game Type:      {0:30} |'.format(gameType))
+        print( '|  Oponent Type:   {0:30} |'.format(oponentType))
+        print( '|  Rounds To Win:  {0:30} |'.format(roundsToWin))
+        print( '|                  {0:30} |'.format(""))
+        print( '|  Winner:         {0:30} |'.format(winner))
+        print( '|                  {0:30} |'.format(""))
+        print( '|-----------\\      {0:30} |'.format(""))
+        print( '|   Games   |      {0:30} |'.format(""))
+        print( '|-------------------------------------------------|')
+        print( '|{0:^11}|{1:^12}|{2:^12}|{3:^11}|'.format('State', 'Your Move', 'Their Move', 'Winner'))
+        print( '|-------------------------------------------------|')
         
         for game in contestDtoDict["games"]:
-            state: str = str(game["gameState"]).format(width=7, align="center")
-            uMove: str = str(game["yourMove"]).format(width=7, align="center")
-            oMove: str = str(game["opponentMove"]).format(width=7, align="center")
-            winer: str = str(game["winner"]).format(width=7, align="center")
-            print(f'|  {state} |  {uMove}  |  {oMove}   |   {winer}  |')
+            state: str = str(game["gameState"])
+            if 'WAIT' in state:
+                state = 'WAITING'
+            yourMove: str = str(game["yourMove"])
+            theirMove: str = str(game["opponentMove"])
+            gameWinner: str = str(game["winner"])
+            print(f'|{state:^11}|{yourMove:^12}|{theirMove:^12}|{gameWinner:^11}|')
 
-        print('\\================================================/\n\n')
+        print('\\=================================================/\n')
 
 
 
