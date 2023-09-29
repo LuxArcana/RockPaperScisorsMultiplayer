@@ -216,27 +216,107 @@ class RockpaperScisorsConsoleUI:
 
         while contestDtoDict["contestState"] == 'WAIT_FOR_PLAYER_JOIN':
             print('Waiting For Player To Join')
-            contestDtoDict = self.apiConsumer.WaitForContestStateChangeFrom(contestDtoDict, 'WAIT_FOR_PLAYER_JOIN', self.waitForOponentJoinTimeoutSeconds)
+
+            try:
+                contestDtoDict = self.apiConsumer.WaitForContestStateChangeFrom(contestDtoDict, 'WAIT_FOR_PLAYER_JOIN', self.waitForOponentJoinTimeoutSeconds)
+            except ContestNotFoundException:
+                print('Contest Not Found While Waiting For Contest State Change')
+                input('Press Enter To Return To Main Menu')
+                return
+            except PlayerNotFoundException:
+                print('Player Is Not Part Of The Contest That is Being Wated For')
+                input('Press Enter To Return To Main Menu')
+                return
+            except Exception as e:
+                print(f'UNEXPECTED SERVER ERROR WAITING FOR CONTEST STATE CHANGE: {e.args[0]}')
+                input('Press Enter To Return To Main Menu')
+                return
+
             if contestDtoDict["contestState"] == 'WAIT_FOR_PLAYER_JOIN':
                 keepWaitingForOponent: str = input("No Oponent Has Joined This Game Yet.  Would You Like To Keep Waiting (y/n)? ")
                 if keepWaitingForOponent.upper() != 'Y':
-                    self.apiConsumer.CancelContest(contestDtoDict["contestId"], contestDtoDict["playerId"])
-                    return
+
+                    try:
+                        self.apiConsumer.CancelContest(contestDtoDict["contestId"], contestDtoDict["playerId"])
+                        print('Contest Canceled Successfully')
+                        input('Press Enter To Return To Main Menu')
+                        return
+                    except ContestNotFoundException:
+                        print('Contest Not Found While Attempting To Cancel')
+                        input('Press Enter To Return To Main Menu')
+                        return
+                    except CancelContestNotAllowed: #THIS IS A SPECIAL CASE THAT CAN BE RECOVEABLE
+                        try:
+                            contestDtoDict = self.apiConsumer.GetContestAsPlayer(contestDtoDict["contestId"], contestDtoDict["playerId"])
+                            if contestDtoDict["contestState"] != 'PLAYING':
+                                print('This Contest Can Not Be Canceled.  It May Have Already Been Canceled')
+                                input('Press Enter To Return To Main Menu')
+                                return
+                        except Exception as e:
+                            print(f'UNEXPECTED SERVER ERROR WHILE RETREIVING CONTEST AFTER CANCELING: {e.args[0]}')
+                            input('Press Enter To Return To Main Menu')
+                            return
+
+                    except Exception as e:
+                        print(f'UNEXPECTED SERVER ERROR WHILE CANCELING CONTEST: {e.args[0]}')
+                        input('Press Enter To Return To Main Menu')
+                        return
+
 
         
         while contestDtoDict["contestState"] == 'PLAYING':
-            (gameDtoDict, contestDtoDict) = self.apiConsumer.PostMove(contestDtoDict, self.Menu_GetMove(contestDtoDict["gameType"]))
+
+            try:
+                (gameDtoDict, contestDtoDict) = self.apiConsumer.PostMove(contestDtoDict, self.Menu_GetMove(contestDtoDict["gameType"]))
+            except ContestNotFoundException:
+                print('Contest Not Found While Attempting To Place A Move')
+                input('Press Enter To Return To Main Menu')
+                return                
+            except GameNotFoundException:
+                print('Game Not Found While Attempting To Place A Move')
+                input('Press Enter To Return To Main Menu')
+                return
+            except PlayerNotFoundException:
+                print('Player Not Found While Attempting To Place A Move')
+                input('Press Enter To Return To Main Menu')
+                return
+            except InvalidMoveException:
+                print('The Move You Attempted To Place Is Not Supported By The Game Type')
+                input('Press Enter Continue')
+                #THIS MIGHT BE OK TO CONTINUE FROM HERE.  NEEDS TESTING
+            except Exception as e:
+                print(f'UNEXPECTED SERVER ERROR WHILE PLACING MOVE TO CONTEST: {e.args[0]}')
+                input('Press Enter To Return To Main Menu')
+                return
+
             self.DisplayContest(contestDtoDict)
 
             gameState: str = gameDtoDict["gameState"]
             gameId: str = gameDtoDict["gameId"]
             if gameState != "COMPLETE":
                 print("\nWaiting For Oponent To Move...")
-                (gameState, contestDtoDict) = self.apiConsumer.WaitForGameState(contestDtoDict, gameId, gameState, 'COMPLETE', self.waitForOponentMoveTimeoutSeconds)
-                if gameState != "COMPLETE":
-                    print("GAME IS BROKEN") #THIS SHOULD NOT HAPPEN AFTER MOVE COUNTDOWNS ARE IMPLIMENTED
+
+                try:
+                    (gameState, contestDtoDict) = self.apiConsumer.WaitForGameState(contestDtoDict, gameId, gameState, 'COMPLETE', self.waitForOponentMoveTimeoutSeconds)
+                except ContestNotFoundException:
+                    print('Contest Not Found While Waiting For Game State COMPLETE')
+                    input('Press Enter To Return To Main Menu')
+                    return  
+                except PlayerNotFoundException:
+                    print('Player Not Found While Waiting For Game State COMPLETE')
+                    input('Press Enter To Return To Main Menu')
+                    return
+                except Exception as e:
+                    print(f'UNEXPECTED SERVER ERROR WHILE WAITING FOR GAME STATE COMPLETE: {e.args[0]}')
+                    input('Press Enter To Return To Main Menu')
                     return
                 
+                if gameState != "COMPLETE":
+                    print("GAME IS BROKEN") #THIS SHOULD NOT HAPPEN AFTER MOVE COUNTDOWNS ARE IMPLIMENTED
+                    input('Press Enter To Return To Main Menu')
+                    return
+
+        #the contest is no longer in the PLAYING state      
         self.DisplayContest(contestDtoDict)
         input('Press Enter To Return To The Main Menu\n')
 
@@ -291,10 +371,29 @@ class RockpaperScisorsConsoleUI:
         while keepPlaying:
             contestDtoDict: dict = None
 
-            contestList = self.apiConsumer.GetContestList()
+            try:
+                contestList = self.apiConsumer.GetContestList()
+            except Exception as e:
+                print(f'UNEXPECTED SERVER ERROR GETING CONTEST LIST: {e.args[0]}')
+                input('Press Enter To Exit')
+                exit(1)
+
             actionGuid: uuid = self.Menu_Main(self.BuildMainMenuItems(contestList))
             if actionGuid == self.createContestGuid:
-                contestDtoDict = self.apiConsumer.CreateContest(self.Menu_ContestName(), self.Menu_RoundsToWin() , self.Menu_GameType(), self.Menu_OponentType())
+
+                try:
+                    contestDtoDict = self.apiConsumer.CreateContest(self.Menu_ContestName(), self.Menu_RoundsToWin() , self.Menu_GameType(), self.Menu_OponentType())
+                except InvalidGameTypeException:
+                    print('Can Not Create Contest.  Server Does Not Support Selected Game Type')
+                    contestDtoDict = None
+                except InvalidOponentTypeException:
+                    print('Can Not Create Contest.  Server Does Not Support Selected Oponent Type')
+                    contestDtoDict = None
+                except Exception as e:
+                    print(f'UNEXPECTED SERVER ERROR CREATING CONTEST: {e.args[0]}')
+                    input('Press Enter To Exit')
+                    exit(1)
+
             elif actionGuid == self.exitGameGuid:
                 keepPlaying = False
             elif actionGuid == self.showAllContestsGuid:
@@ -307,13 +406,28 @@ class RockpaperScisorsConsoleUI:
                 for contestDto in contestList:
                     if contestDto["contestId"] == actionGuid:
                         if contestDto["contestState"] == 'WAIT_FOR_PLAYER_JOIN':
-                            contestDtoDict = self.apiConsumer.JoinContest(contestDto["contestId"])
-                            if contestDtoDict is None:
+                            try:
+                                contestDtoDict = self.apiConsumer.JoinContest(contestDto["contestId"])
+                            except ContestFullException:
                                 print('That Contest Is Already Full Or Was Canceled')
                                 input('Press Enter To Return To The Main Menu')
+                                contestDtoDict = None
+                            except Exception as e:
+                                print(f'UNEXPECTED SERVER ERROR JOINING CONTEST: {e.args[0]}')
+                                input('Press Enter To Exit')
+                                exit(1)
+
                         else:
-                            contestDtoDict = self.apiConsumer.GetContest(contestDto["contestId"])
-                            self.DisplayContest(contestDtoDict)
+                            try:
+                                contestDtoDict = self.apiConsumer.GetContest(contestDto["contestId"])
+                                self.DisplayContest(contestDtoDict)
+                            except ContestNotFoundException:
+                                print('Contest Not Found')
+                            except Exception as e:
+                                print(f'UNEXPECTED SERVER ERROR RETREIVING CONTEST: {e.args[0]}')
+                                input('Press Enter To Exit')
+                                exit(1)
+                            
                             contestDtoDict = None
                             input('Press Enter To Return To The Main Menu')
                         
