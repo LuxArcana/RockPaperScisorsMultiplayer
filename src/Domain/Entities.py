@@ -42,7 +42,9 @@ class Contest:
 
   
   def Join (self) -> ContestResponseDto:
-    #state checking here for now accept all
+    if len(self.players) >= 2:
+      raise ContestFullException
+
     playerId = uuid.uuid4()
     self.players.append(playerId)
     self.contestState = 'PLAYING'

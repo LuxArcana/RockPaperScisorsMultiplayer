@@ -32,6 +32,14 @@ class RockPaperScisorsApiConsumer:
 
 
 
+    def GetContest(self, contestId: str) -> dict:
+        response = requests.get(f'{self.apiBaseUrl}contest/{contestId}', headers=self.headers)
+        if response.status_code != 200:
+            return None #throw exception later
+        return response.json()
+
+
+
     def GetContestAsPlayer(self, contestId: str, playerId: str) -> dict:
         response = requests.get(f'{self.apiBaseUrl}contest/{contestId}/player/{playerId}', headers=self.headers)
         if response.status_code != 200:
@@ -96,24 +104,30 @@ class RockPaperScisorsApiConsumer:
     def WaitForContestStateChangeFrom(self, contestDtoDict: dict, targetContestState: str, timeoutSeconds: int) -> dict:
         secondsWaited: int = 0
         while contestDtoDict["contestState"] == targetContestState:
+            
+            if secondsWaited >= timeoutSeconds:
+                return contestDtoDict
+            
             time.sleep(1)
             contestDtoDict = self.GetContestAsPlayer(contestDtoDict["contestId"], contestDtoDict["playerId"])
             secondsWaited += 1
-            if secondsWaited >= timeoutSeconds:
-                return contestDtoDict
+            
             
         return contestDtoDict
 
 
 
-    def WaitForGameState(self, contestDtoDict: dict, gameId: uuid, currentGameState: str, targetGameState: str,  timeoutSeconds: int) -> (dict, dict):
+    def WaitForGameState(self, contestDtoDict: dict, gameId: uuid, currentGameState: str, targetGameState: str,  timeoutSeconds: int) -> (str, dict):
         secondsWaited: int = 0
         while currentGameState != targetGameState:
             time.sleep(1)
             secondsWaited += 1
 
             if secondsWaited >= timeoutSeconds:
-                return contestDtoDict
+                for game in contestDtoDict["games"]:
+                    if game["gameId"] == gameId:
+                        return game["gameState"], contestDtoDict
+                raise Exception(f'Game: {gameId} is No Longer Part Of Contest: {contestDtoDict["contestId"]}')
         
             contestDtoDict = self.GetContestAsPlayer(contestDtoDict["contestId"], contestDtoDict["playerId"])
             games = contestDtoDict["games"]

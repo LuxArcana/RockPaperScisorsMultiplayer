@@ -12,10 +12,14 @@ class RockpaperScisorsConsoleUI:
 
         self.createContestGuid: uuid = uuid.uuid4()
         self.refreshListGuid: uuid = uuid.uuid4()
+        self.showAllContestsGuid: uuid = uuid.uuid4()
+        self.hideUnjoinableContestsGuid: uuid = uuid.uuid4()
         self.exitGameGuid: uuid = uuid.uuid4()
 
-        self.waitForOponentJoinTimeoutSeconds = 20 #place holder for user input
+        self.waitForOponentJoinTimeoutSeconds = 60 #place holder for user input
         self.waitForOponentMoveTimeoutSeconds = 60 #place holder for user input + 10 seconds
+
+        self.showAllContests: bool = False
 
 
     def Menu_Main(self, menuItems: dict) -> uuid:
@@ -46,7 +50,7 @@ class RockpaperScisorsConsoleUI:
             if menuSelection in menuItems:
                 actionGuid = menuItems[menuSelection][1]
             else:
-                menuHeader = '\n### INVALID SELECTION, TRY AGAIN ###'
+                errorHeader = '\n### INVALID SELECTION, TRY AGAIN ###'
                 
         return actionGuid
 
@@ -171,6 +175,9 @@ class RockpaperScisorsConsoleUI:
         menuItems: dict = dict()
         menuIndex: int = 1
 
+        if self.showAllContests == False:
+            contestList = [filteredContest for filteredContest in contestList if filteredContest["contestState"] == 'WAIT_FOR_PLAYER_JOIN']
+
         for contestDict in contestList:
             menuText: str = self.GetMenuDisplayTextFromContestDict(contestDict, menuIndex)
             menuItems.update({str(menuIndex): (menuText, contestDict["contestId"])})
@@ -181,6 +188,13 @@ class RockpaperScisorsConsoleUI:
 
         menuText = f'|{"R":^5}| {"Refresh Contests":31}  {"":31} {"":^9}  {"":21}|'
         menuItems.update({"R":(menuText, self.refreshListGuid)})
+
+        if self.showAllContests:
+            menuText = f'|{"H":^5}| {"Hide Unjoinable Contests":31}  {"":31} {"":^9}  {"":21}|'
+            menuItems.update({"H":(menuText, self.hideUnjoinableContestsGuid)})
+        else:
+            menuText = f'|{"S":^5}| {"Show All Contests":31}  {"":31} {"":^9}  {"":21}|'
+            menuItems.update({"S":(menuText, self.showAllContestsGuid)})
 
         menuText = f'|{"X":^5}| {"Exit Game":31}  {"":31} {"":^9}  {"":21}|'
         menuItems.update({"X":(menuText, self.exitGameGuid)})
@@ -195,7 +209,7 @@ class RockpaperScisorsConsoleUI:
 
         while contestDtoDict["contestState"] == 'WAIT_FOR_PLAYER_JOIN':
             print('Waiting For Player To Join')
-            self.apiConsumer.WaitForContestStateChangeFrom(contestDtoDict, 'WAIT_FOR_PLAYER_JOIN', self.waitForOponentJoinTimeoutSeconds)
+            contestDtoDict = self.apiConsumer.WaitForContestStateChangeFrom(contestDtoDict, 'WAIT_FOR_PLAYER_JOIN', self.waitForOponentJoinTimeoutSeconds)
             if contestDtoDict["contestState"] == 'WAIT_FOR_PLAYER_JOIN':
                 keepWaitingForOponent: str = input("No Oponent Has Joined This Game Yet.  Would You Like To Keep Waiting (y/n)? ")
                 if keepWaitingForOponent.upper() != 'Y':
@@ -211,8 +225,8 @@ class RockpaperScisorsConsoleUI:
             gameId: str = gameDtoDict["gameId"]
             if gameState != "COMPLETE":
                 print("\nWaiting For Oponent To Move...")
-                (gameDtoDict, contestDtoDict) = self.apiConsumer.WaitForGameState(contestDtoDict, gameId, gameState, 'COMPLETE', self.waitForOponentMoveTimeoutSeconds)
-                if gameDtoDict["gameState"] != "COMPLETE":
+                (gameState, contestDtoDict) = self.apiConsumer.WaitForGameState(contestDtoDict, gameId, gameState, 'COMPLETE', self.waitForOponentMoveTimeoutSeconds)
+                if gameState != "COMPLETE":
                     print("GAME IS BROKEN") #THIS SHOULD NOT HAPPEN AFTER MOVE COUNTDOWNS ARE IMPLIMENTED
                     return
                 
@@ -224,6 +238,7 @@ class RockpaperScisorsConsoleUI:
 
     def DisplayContest(self, contestDtoDict: dict):
         contestName: str = str(contestDtoDict["contestName"]) 
+        contestState: str = str(contestDtoDict["contestState"]) 
         gameType: str = str(contestDtoDict["gameType"])
         oponentType: str = str(contestDtoDict["oponentType"])
         roundsToWin: str = str(contestDtoDict["roundsToWin"])
@@ -232,6 +247,7 @@ class RockpaperScisorsConsoleUI:
         system('cls')
         print( '/=================================================\\')
         print( '|  Contest Name:   {0:30} |'.format(contestName))
+        print( '|  Contest State:  {0:30} |'.format(contestState))
         print( '|  Game Type:      {0:30} |'.format(gameType))
         print( '|  Oponent Type:   {0:30} |'.format(oponentType))
         print( '|  Rounds To Win:  {0:30} |'.format(roundsToWin))
@@ -270,13 +286,26 @@ class RockpaperScisorsConsoleUI:
                 contestDtoDict = self.apiConsumer.CreateContest(self.Menu_ContestName(), self.Menu_RoundsToWin() , self.Menu_GameType(), self.Menu_OponentType())
             elif actionGuid == self.exitGameGuid:
                 keepPlaying = False
+            elif actionGuid == self.showAllContestsGuid:
+                self.showAllContests = True
+            elif actionGuid == self.hideUnjoinableContestsGuid:
+                self.showAllContests = False
             elif actionGuid == self.refreshListGuid or actionGuid is None:
                 pass #do nothing and redraw menu
-            else: #look for a contest
+            else: #look for a contest to join
                 for contestDto in contestList:
                     if contestDto["contestId"] == actionGuid:
-                        contestDtoDict = contestDto
-                        break
+                        if contestDto["contestState"] == 'WAIT_FOR_PLAYER_JOIN':
+                            contestDtoDict = self.apiConsumer.JoinContest(contestDto["contestId"])
+                            if contestDtoDict is None:
+                                print('That Contest Is Already Full Or Was Canceled')
+                                input('Press Enter To Return To The Main Menu')
+                        else:
+                            contestDtoDict = self.apiConsumer.GetContest(contestDto["contestId"])
+                            self.DisplayContest(contestDtoDict)
+                            contestDtoDict = None
+                            input('Press Enter To Return To The Main Menu')
+                        
             
             if contestDtoDict is not None:
                 self.PlayContest(contestDtoDict)

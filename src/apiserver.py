@@ -154,6 +154,11 @@ def JoinContest(rawContestId: str):
         response.headers.add('Content-Type', 'application/json')
         return response
     
+    except ContestFullException:
+        response = make_response(f'{{"error":"ContestFullException"}}', 400)
+        response.headers.add('Content-Type', 'application/json')
+        return response
+
     except ValueError:
         response = make_response(f'{{"error":"ValueError","message":"Could Not Parse Provided contestId |{rawContestId}| into a GUID"}}', 400)
         response.headers.add('Content-Type', 'application/json')

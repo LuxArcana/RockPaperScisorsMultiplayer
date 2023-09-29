@@ -21,3 +21,6 @@ class InvalidOponentTypeException(Exception):
 
 class CancelContestNotAllowed(Exception):
     pass
+
+class ContestFullException(Exception):
+    pass
