@@ -134,7 +134,7 @@ class Game:
     thisPlayerId: uuid = playerMove.playerId
     
     if thisPlayerId in self.moves:
-      return self.BuildResponseDto(thisPlayerId)
+      return self.BuildResponseDto(thisPlayerId, 'YOU')
     
     if not thisPlayerId in self.players:
       raise PlayerNotFoundException
@@ -176,7 +176,7 @@ class Game:
     if len(self.moves) == 0:
       self.moves.update({thisPlayerId: move})
       self.gameState = 'WAIT_FOR_ONE_PLAYER_MOVE'
-      return self.BuildResponseDto(thisPlayerId)
+      return self.BuildResponseDto(thisPlayerId, 'YOU')
 
     #try to add second move
     if len(self.moves) == 1:
@@ -202,12 +202,12 @@ class Game:
           self.winningPlayerId = None
           self.gameState = 'ERROR'
         
-      return self.BuildResponseDto(thisPlayerId)
+      return self.BuildResponseDto(thisPlayerId, 'YOU')
     
     return GameResponseDto(self.gameId, 'INVALID', None, None, None)
     
     
-  def BuildResponseDto(self, playerId) -> GameResponseDto:
+  def BuildResponseDto(self, playerId, playerLabel: str) -> GameResponseDto:
     
     opponentMove = None
     yourMove = None
@@ -220,7 +220,7 @@ class Game:
     
     if self.winningPlayerId is not None:
       if self.winningPlayerId == playerId:
-        winner = 'YOU'
+        winner = playerLabel
       else:
         winner = 'OPPONENT'
     

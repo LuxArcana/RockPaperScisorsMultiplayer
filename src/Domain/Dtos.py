@@ -96,19 +96,41 @@ class ContestResponseDto:
     self.gameType: str = contest.gameType
     self.oponentType: str = contest.oponentType
     self.winningPlayer: str = None
+    self.playerId: str = None
+    
+    thisPlayerLabel: str = 'YOU'
+
+    if playerId is not None:
+      self.playerId = playerId
+
+
+    if playerId is None:
+
+      if len(contest.players) >= 1 and contest.contestState != 'PLAYING':
+        playerId = contest.players[0]
+        thisPlayerLabel = 'HOST'
+      
+      
+        
+
+      
+
     
     if contest.winningPlayerId is not None:
       if contest.winningPlayerId == playerId:
-        self.winningPlayer = 'YOU'
+        self.winningPlayer = thisPlayerLabel
       else:
         self.winningPlayer = 'OPPONENT'
     
     self.games = dict()
     for gameId, game in contest.games.items():
-      self.games.update({gameId: game.BuildResponseDto(playerId)})
+      self.games.update({gameId: game.BuildResponseDto(playerId, thisPlayerLabel)})
     
     self.currentGameId: uuid = contest.currentGameId
-    self.playerId = playerId
+
+    return
+    
+  
 
   #def __getstate__(self):
   #  return self.contestId, self.contestName, self.contestState, self.roundsToWin, self.gameType, self.oponentType, self.winningPlayer, self.games

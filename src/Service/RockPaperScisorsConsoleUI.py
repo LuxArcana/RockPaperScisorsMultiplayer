@@ -175,13 +175,20 @@ class RockpaperScisorsConsoleUI:
         menuItems: dict = dict()
         menuIndex: int = 1
 
-        if self.showAllContests == False:
-            contestList = [filteredContest for filteredContest in contestList if filteredContest["contestState"] == 'WAIT_FOR_PLAYER_JOIN']
 
-        for contestDict in contestList:
-            menuText: str = self.GetMenuDisplayTextFromContestDict(contestDict, menuIndex)
-            menuItems.update({str(menuIndex): (menuText, contestDict["contestId"])})
-            menuIndex += 1
+        try:
+            if self.showAllContests == False:
+                contestList = [filteredContest for filteredContest in contestList if filteredContest["contestState"] == 'WAIT_FOR_PLAYER_JOIN']
+
+            for contestDict in contestList:
+                menuText: str = self.GetMenuDisplayTextFromContestDict(contestDict, menuIndex)
+                menuItems.update({str(menuIndex): (menuText, contestDict["contestId"])})
+                menuIndex += 1
+
+        except Exception as e:
+            print(f'SERVER COMUNICATION FAILURE: {e.args[0]}')
+            exit(1)
+
 
         menuText = f'|{"C":^5}| {"Create New Contest":31}  {"":31} {"":^9}  {"":21}|'
         menuItems.update({"C":(menuText, self.createContestGuid)})
@@ -244,6 +251,10 @@ class RockpaperScisorsConsoleUI:
         roundsToWin: str = str(contestDtoDict["roundsToWin"])
         winner: str = str(contestDtoDict["winningPlayer"])
 
+        thisMoveTitle: str = 'Your Move'
+        if contestDtoDict["playerId"] == 'None':
+            thisMoveTitle = 'Host Move'
+
         system('cls')
         print( '/=================================================\\')
         print( '|  Contest Name:   {0:30} |'.format(contestName))
@@ -257,7 +268,7 @@ class RockpaperScisorsConsoleUI:
         print( '|-----------\\      {0:30} |'.format(""))
         print( '|   Games   |      {0:30} |'.format(""))
         print( '|-------------------------------------------------|')
-        print( '|{0:^11}|{1:^12}|{2:^12}|{3:^11}|'.format('State', 'Your Move', 'Their Move', 'Winner'))
+        print( '|{0:^11}|{1:^12}|{2:^12}|{3:^11}|'.format('State', thisMoveTitle, 'Their Move', 'Winner'))
         print( '|-------------------------------------------------|')
         
         for game in contestDtoDict["games"]:

@@ -2,6 +2,7 @@ import requests
 import time
 from Domain.Dtos import *
 from Domain.MoveTokens import *
+from Domain.Exceptions import *
 
 
 

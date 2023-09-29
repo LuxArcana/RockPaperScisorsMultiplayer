@@ -30,10 +30,16 @@ def test():
 #list all contests
 @app.route('/api/v1/contests', methods=['GET'])
 def GetContests():
-    contestListResponseDto: ContestListResponseDto = _service.GetContests()
-    response = make_response(contestListResponseDto.to_json(), 200)
-    response.headers.add('Content-Type', 'application/json')
-    return response
+    try:
+        contestListResponseDto: ContestListResponseDto = _service.GetContests()
+        response = make_response(contestListResponseDto.to_json(), 200)
+        response.headers.add('Content-Type', 'application/json')
+        return response
+    
+    except Exception as e:
+        response = make_response(f'{{"error":"Exception","message":"{e.args[0]}"}}', 500)
+        response.headers.add('Content-Type', 'application/json')
+        return response
 
 
 
