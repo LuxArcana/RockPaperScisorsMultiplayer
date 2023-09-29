@@ -21,3 +21,21 @@ TODO: player move timeout.
 TODO:
     refactor RockPaperScisorsConsoleUI.PlayContest
     this method is to long
+
+TODO:
+    fix location of build game response DTO
+
+TODO:
+    Add DB Backend to increase thread count
+
+TODO:
+    add api service configuration object
+
+TODO:
+    add client service configuration object
+
+TODO:
+    add acme certificate managment and https to NGINX reverse proxy
+
+TODO(MABEY):
+    add html version of client
