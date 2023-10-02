@@ -1,12 +1,14 @@
 version: "3.9"
 
 services:
-  gunicorn_flask_app:
-    container_name: rockpaperscisors_flask_app
-    image: rockpaperscisorsweb:v1
-    build: .
+  rps_api_gunicorn_flask:
+    container_name: rockpaperscisors_flask_api
+    image: rockpaperscisorswebapi:latest
+    build:
+      context: ./
+      dockerfile: ./docker/api/Dockerfile
     ports:
-      - "5000"
+      - 5000:5000
     networks:
       - my-rps-network
 
