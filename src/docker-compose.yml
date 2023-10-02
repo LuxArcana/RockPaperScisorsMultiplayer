@@ -12,6 +12,18 @@ services:
     networks:
       - my-rps-network
 
+
+  rps_frontend_gunicorn_flask:
+    container_name: rockpaperscisors_flask_frontend
+    image: rockpaperscisorswebfrontend:latest
+    build:
+      context: ./
+      dockerfile: ./docker/frontend/Dockerfile
+    ports:
+      - 5001:5001
+    networks:
+      - my-rps-network  
+
   
   nginx:
     container_name: production_nginx
