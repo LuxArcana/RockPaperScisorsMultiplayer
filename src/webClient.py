@@ -25,9 +25,17 @@ def test():
         message = e.args[0]
     
     return render_template('healthz.html', message=message)
-        
+
+
+
     
-   
+@app.route('/', methods=['GET'])
+def mainEndpoint():
+    try:
+        return render_template('index.html')
+    except Exception as e:
+        return render_template('error.html', message=e.args[0])
+
 
 
 #start the web service manually if this was launched directly instead of from WSGI
