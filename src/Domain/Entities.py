@@ -187,20 +187,31 @@ class Game:
     if len(self.moves) == 2:
       otherPlayerId = self.GetOtherPlayerId(thisPlayerId)
       otherPlayerMove = self.moves[otherPlayerId]
-      result = move.equality(otherPlayerMove)
-      match result:
-        case -1:
-          self.winningPlayerId = otherPlayerId
-          self.gameState = 'COMPLETE'
-        case 0:
-          self.winningPlayerId = None
-          self.gameState = 'COMPLETE'
-        case 1:
-          self.winningPlayerId = thisPlayerId
-          self.gameState = 'COMPLETE'
-        case _:
-          self.winningPlayerId = None
-          self.gameState = 'ERROR'
+      
+      if move > otherPlayerMove:
+        self.winningPlayerId = thisPlayerId
+        self.gameState = 'COMPLETE'
+      elif move < otherPlayerMove:
+        self.winningPlayerId = thisPlayerId
+        self.gameState = 'COMPLETE'
+      else:
+        self.winningPlayerId = None
+        self.gameState = 'COMPLETE'
+
+      #result = move.equality(otherPlayerMove)
+      #match result:
+      #  case -1:
+      #    self.winningPlayerId = otherPlayerId
+      #    self.gameState = 'COMPLETE'
+      #  case 0:
+      #    self.winningPlayerId = None
+      #    self.gameState = 'COMPLETE'
+      #  case 1:
+      #    self.winningPlayerId = thisPlayerId
+      #    self.gameState = 'COMPLETE'
+      #  case _:
+      #    self.winningPlayerId = None
+      #    self.gameState = 'ERROR'
         
       return self.BuildResponseDto(thisPlayerId, 'YOU')
     
