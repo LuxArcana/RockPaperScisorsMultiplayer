@@ -4,7 +4,7 @@ from Service.RockPaperScisorsApiConsumer import *
 
 
 API_BASE_URL: str = 'http://rps_api_gunicorn_flask:5000/api/v1/'
-API_BASE_URL_PUBLIC: str = 'http://127.0.0.1:88/rps/api/v1/'
+API_BASE_URL_PUBLIC: str = 'http://127.0.0.1:8080/rps/api/v1/'
 API_KEY: str = 'X'
 MAX_ROUNDS_TO_WIN: int = 9
 

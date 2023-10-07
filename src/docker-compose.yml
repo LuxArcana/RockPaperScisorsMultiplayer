@@ -29,7 +29,7 @@ services:
     container_name: production_nginx
     image: nginx:latest
     ports:
-      - 88:88
+      - 8080:8080
     networks:
       - my-rps-network
     volumes:
