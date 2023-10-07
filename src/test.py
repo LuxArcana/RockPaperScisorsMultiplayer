@@ -5,7 +5,7 @@ from Service.RockPaperScisorsService import *
 
 _service = RockPaperScisorsService()
 
-contestRequest = CreateContestRequestDto('Bob', 3, 'rock_paper_scisors', 'pvp') #server call
+contestRequest = CreateContestRequestDto('Bob', 7, 'rock_paper_scisors', 'pvp') #server call
 
 player1Contest: ContestResponseDto = _service.CreateContest(contestRequest) #server call
 
