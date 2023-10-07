@@ -188,11 +188,11 @@ class Game:
       otherPlayerId = self.GetOtherPlayerId(thisPlayerId)
       otherPlayerMove = self.moves[otherPlayerId]
       
-      if move > otherPlayerMove:
+      if move.equality(otherPlayerMove) > 0:
         self.winningPlayerId = thisPlayerId
         self.gameState = 'COMPLETE'
-      elif move < otherPlayerMove:
-        self.winningPlayerId = thisPlayerId
+      elif move.equality(otherPlayerMove) < 0:
+        self.winningPlayerId = otherPlayerId
         self.gameState = 'COMPLETE'
       else:
         self.winningPlayerId = None

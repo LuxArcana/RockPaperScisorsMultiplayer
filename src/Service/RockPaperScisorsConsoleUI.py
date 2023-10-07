@@ -25,11 +25,11 @@ class RockpaperScisorsConsoleUI:
     def Menu_Main(self, menuItems: dict) -> uuid:
         actionGuid: uuid = None
 
-        system('cls')
+        system('clear')
         errorHeader: str = ''
 
         while actionGuid is None:
-            system('cls')
+            system('clear')
             print(errorHeader)
             print( '/========================================================================================================\\')
             print(f'|{"MAIN MENU":^104}|')
@@ -335,7 +335,7 @@ class RockpaperScisorsConsoleUI:
         if contestDtoDict["playerId"] == 'None':
             thisMoveTitle = 'Host Move'
 
-        system('cls')
+        system('clear')
         print( '/=================================================\\')
         print( '|  Contest Name:   {0:30} |'.format(contestName))
         print( '|  Contest State:  {0:30} |'.format(contestState))
