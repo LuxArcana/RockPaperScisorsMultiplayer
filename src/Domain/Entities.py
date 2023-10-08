@@ -139,7 +139,7 @@ class Game:
     if not thisPlayerId in self.players:
       raise PlayerNotFoundException
     
-    move = MoveTokenBuilder.FromName(playerMove.move)
+    move = MoveToken.FromName(playerMove.move)
 
     if move is None:
       raise InvalidMoveException
@@ -151,23 +151,25 @@ class Game:
       if self.gameType == 'ROCK_PAPER_SCISORS_LIZARD_SPOK':
         posibleMoves = 5
 
-      computerMoveNumber: int = random.randint(1,posibleMoves)
-      computerMoveName: str = ''
-      match(computerMoveNumber):
-        case 1:
-          computerMoveName = 'R'
-        case 2:
-          computerMoveName = 'P'
-        case 3:
-          computerMoveName = 'S'
-        case 4:
-          computerMoveName = 'L'
-        case 5:
-          computerMoveName = 'K'
-        case _:
-          computerMoveName = 'INVALID'
+      computerMoveNumber: int = random.randint(0,posibleMoves -1)
+      moveList = ['R', 'P', 'S', 'L', 'K']
+      computerMoveName: str = moveList[computerMoveNumber]
+      #match(computerMoveNumber):
+      #  case 1:
+      #    computerMoveName = 'R'
+      #  case 2:
+      #    computerMoveName = 'P'
+      #  case 3:
+      #    computerMoveName = 'S'
+      #  case 4:
+      #    computerMoveName = 'L'
+      #  case 5:
+      #    computerMoveName = 'K'
+      #  case _:
+      #    computerMoveName = 'INVALID'
+      
 
-      computerMove: MoveToken = MoveTokenBuilder.FromName(computerMoveName)
+      computerMove: MoveToken = MoveToken.FromName(computerMoveName)
       computerPlayerId: uuid = self.GetOtherPlayerId(thisPlayerId)
       self.moves.update({computerPlayerId: computerMove})
       
@@ -188,15 +190,24 @@ class Game:
       otherPlayerId = self.GetOtherPlayerId(thisPlayerId)
       otherPlayerMove = self.moves[otherPlayerId]
       
-      if move.equality(otherPlayerMove) > 0:
+      if move > otherPlayerMove:
         self.winningPlayerId = thisPlayerId
-        self.gameState = 'COMPLETE'
-      elif move.equality(otherPlayerMove) < 0:
+      elif move < otherPlayerMove:
         self.winningPlayerId = otherPlayerId
-        self.gameState = 'COMPLETE'
       else:
         self.winningPlayerId = None
-        self.gameState = 'COMPLETE'
+      
+      self.gameState = 'COMPLETE'
+
+      #if move.equality(otherPlayerMove) > 0:
+      #  self.winningPlayerId = thisPlayerId
+      #  self.gameState = 'COMPLETE'
+      #elif move.equality(otherPlayerMove) < 0:
+      #  self.winningPlayerId = otherPlayerId
+      #  self.gameState = 'COMPLETE'
+      #else:
+      #  self.winningPlayerId = None
+      #  self.gameState = 'COMPLETE'
 
       #result = move.equality(otherPlayerMove)
       #match result:

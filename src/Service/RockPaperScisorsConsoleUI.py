@@ -156,7 +156,7 @@ class RockpaperScisorsConsoleUI:
             print( ' ------------------------------')
 
             rawInput = input(f'Enter A Move ({abrvMoves}): ')
-            move = MoveTokenBuilder.FromName(rawInput)
+            move = MoveToken.FromName(rawInput)
             if move is not None and move.Name != 'INVALID':
                 moveName = move.Name
             else:
