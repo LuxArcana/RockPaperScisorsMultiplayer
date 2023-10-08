@@ -33,7 +33,7 @@ def test():
 @app.route('/', methods=['GET'])
 def mainEndpoint():
     try:
-        return render_template('index.html')
+        return render_template('index.html', contests=rpsApi.GetContestList())
     except Exception as e:
         return render_template('error.html', message=e.args[0])
 

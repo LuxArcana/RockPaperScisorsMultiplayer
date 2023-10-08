@@ -1,5 +1,38 @@
 <HTTP>
     <BODY>
         <H1>MAIN PLACEHOLDER</H1>
+
+
+        {% block content %}
+
+        <table border="10" cellpading="4">
+            <thead>
+                <tr>
+                    <td></td>
+                    <td>Name</td>
+                    <td>State</td>
+                    <td>Type</td>
+                    <td>Oponent</td>
+                    <td>Rounds To Win</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contest in contests %}
+                <tr>
+                    <td><button width="100" height="30">{{ contest.contestId }}</button></td>
+                    <td>{{ contest.contestName }}</td>
+                    <td align="center">{{ contest.contestState }}</td>
+                    <td align="center">{{ contest.gameType }}</td>
+                    <td align="center">{{ contest.oponentType }}</td>
+                    <td align="center">{{ contest.roundsToWin }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+
+        </table>
+
+        {% endblock %}
+
     </BODY>
 </HTTP>
