@@ -13,6 +13,7 @@ to stop docker image server
 docker compose down
 
 
+Game Main Entry Point is consoleclient.py
 
 
 
